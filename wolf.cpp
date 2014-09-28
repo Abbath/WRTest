@@ -5,7 +5,7 @@
 Wolf::Wolf() : Creature(WOLF_START_HUNGRY){}
 
 void Wolf::makePregnant(){ 
-    if(pregnancyTime == 0) pregnancyTime = WOLF_PREGNANCY_TIME; 
+    if(pregnancyTime == 0 && !male && hungry > WOLF_START_HUNGRY/2 && age > 5) pregnancyTime = WOLF_PREGNANCY_TIME; 
 }
 
 void Wolf::fixCoords()
@@ -32,6 +32,7 @@ void Wolf::step(){
                 int newx = coords.first + i;
                 int newy = coords.second + j;
                 Creature::fixCoords(newx, newy);
+                //std::cerr << "sixth" << std::endl;                
                 if(!field->getCreatureCell(std::make_pair(newx, newy)).getRabbitIndexes().empty()){
                     coords.first += i;
                     coords.second += j;
@@ -55,8 +56,13 @@ void Wolf::step(){
     field->wolfWasHere(coords);    
 }
 
+void Wolf::eat()
+{
+    if(hungry < WOLF_START_HUNGRY) hungry++;
+}
+
 bool Wolf::isAlive() {
-    return hungry != 0 && age != WOLF_MAX_AGE;
+    return hungry > 0 && age <= WOLF_MAX_AGE;
 }
 
 bool Wolf::operator ==(const Wolf &w){ 

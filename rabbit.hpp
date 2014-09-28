@@ -7,6 +7,7 @@ class Rabbit : public Creature{
 public:
     Rabbit();
     void makePregnant();
+    void eat();
     void step();
     bool isAlive();   
     bool operator ==(const Rabbit& r);

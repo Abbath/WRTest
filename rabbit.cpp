@@ -4,7 +4,12 @@
 Rabbit::Rabbit() : Creature(RABBIT_START_HUNGRY){}
 
 void Rabbit::makePregnant(){ 
-    if(pregnancyTime == 0) pregnancyTime = RABBIT_PREGNANCY_TIME; 
+    if(pregnancyTime == 0 && !male) pregnancyTime = RABBIT_PREGNANCY_TIME; 
+}
+
+void Rabbit::eat()
+{
+    if(hungry < RABBIT_START_HUNGRY) hungry++;
 }
 
 void Rabbit::fixCoords()
@@ -32,13 +37,30 @@ void Rabbit::step(){
         field->rabbitWasHere(coords);
         return;
     }
+    for(int i = -1; i <=1; ++i){
+        for(int j = -1; j <=1; ++j){
+            if(i+j != 0){
+                int newx = coords.first + i;
+                int newy = coords.second + j;
+                Creature::fixCoords(newx, newy);
+                if(field->getCreatureCell(coords).getIsThereGrass()){
+                    coords.first += i;
+                    coords.second += j;
+                    fixCoords();
+                    field->rabbitWasHere(coords); 
+                    return;
+                }
+            }
+        }
+    }
     coords.first = newx;
     coords.second = newy;
     fixCoords();
+    field->rabbitWasHere(coords);    
 }
 
 bool Rabbit::isAlive() {
-    return hungry != 0 && age != RABBIT_MAX_AGE;
+    return hungry > 0 && age <= RABBIT_MAX_AGE;
 }
 
 bool Rabbit::operator ==(const Rabbit &r){ 

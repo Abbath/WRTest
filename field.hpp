@@ -15,6 +15,7 @@ class Field {
     std::unordered_map<int, Wolf> wolfsMap;
     std::unordered_map<int, Rabbit> rabbitsMap;
     int creaturesCounter;    
+    int stepCounter;
     static constexpr int prCount = WOLF_NUMBER;
     static constexpr int viCount = RABBIT_NUMBER;
     std::function<int()> dice;
@@ -27,7 +28,8 @@ public:
     void feedRabbits(Cell& c);
     void feedWolfs(Cell& c);
     void fixCoords();
-    void cleanDead(std::list<Wolf> itdw, std::list<Rabbit> itdr);
+    void cleanDead(Indexes itdw, Indexes itdr);
+    void bornNew(const Indexes& neww, const Indexes& newr);
     void step();
     bool wasWolfHere(std::pair<int, int> p);
     bool wasRabbitHere(std::pair<int, int> p);

@@ -1,4 +1,5 @@
 #include "field.hpp"
+#include <thread>
 
 int main()
 {
@@ -8,8 +9,8 @@ int main()
     while(!field.isEmpty()){
         field.step();
         field.print();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
-    field.print();
     return 0;
 }
 

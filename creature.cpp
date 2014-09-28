@@ -1,5 +1,6 @@
 #include "creature.hpp"
 #include "field.hpp"
+#include <cassert>
 int Creature::getid(){
     static int id = 0;
     return id++;
@@ -56,6 +57,7 @@ Field *Creature::getField() const
 
 void Creature::setField(Field *value)
 {
+    assert(value);
     field = value;
 }
 std::pair<int, int> Creature::getCoords() const

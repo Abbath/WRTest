@@ -11,65 +11,63 @@ void Cell::setRabbitWasHere(bool value)
     rabbitWasHere = value;
 }
 
-void Cell::fixIndexes(int index, bool iswolf)
+void Cell::removeRabbitIndexes(const Indexes &indexes)
 {
-     if(iswolf){
-        for(auto& x : wolfIndexes){
-            if(index < x){
-                x--;
-            }
-        }
-    }else{
-        for(auto& x : rabbitIndexes){
-            if(index < x){
-                x--;
-            }
-        }
+    for(auto x : indexes){
+        rabbitIndexes.erase(x);
     }
 }
+
+void Cell::removeWolfIndexes(const Indexes &indexes)
+{
+    for(auto x : indexes){
+        wolfIndexes.erase(x);
+    }
+}
+
 Cell::Cell(): isThereGrass(true){
     
 }
 
-std::list<int> Cell::getWolfIndexes() const
+Indexes Cell::getWolfIndexes() const
 {
     return wolfIndexes;
 }
 
-const std::list<int>& Cell::getWolfIndexesRef()
+const Indexes& Cell::getWolfIndexesRef()
 {
     return wolfIndexes;
 }
 
-void Cell::setWolfIndexes(const std::list<int> &value)
+void Cell::setWolfIndexes(const Indexes &value)
 {
     wolfIndexes = value;
 }
 
-std::list<int> Cell::getRabbitIndexes() const
+Indexes Cell::getRabbitIndexes() const
 {
     return rabbitIndexes;
 }
 
-void Cell::setRabbitIndexes(const std::list<int> &value)
+void Cell::setRabbitIndexes(const Indexes &value)
 {
     rabbitIndexes = value;
 }
 
 void Cell::removeWolfIndex(int index){
-    wolfIndexes.erase(std::find(wolfIndexes.begin(), wolfIndexes.end(), index));
+    wolfIndexes.erase(index);
 }
 
 void Cell::removeRabbitIndex(int index){
-    rabbitIndexes.erase(std::find(rabbitIndexes.begin(), rabbitIndexes.end(), index));
+    rabbitIndexes.erase(index);
 }
 
-int Cell::getLastRabbitIndex() const {
-    return rabbitIndexes.back(); 
+int Cell::getFirstRabbitIndex() const {
+    return *(rabbitIndexes.begin()); 
 }
 
-void Cell::removeLastRabbitIndex() { 
-    rabbitIndexes.pop_back();
+void Cell::removeFirstRabbitIndex() { 
+    rabbitIndexes.erase(rabbitIndexes.begin());
 }
 
 bool Cell::getWolfWasHere() const
@@ -83,11 +81,11 @@ void Cell::setWolfWasHere(bool value)
 }
 
 void Cell::addPredator(int index){ 
-    wolfIndexes.push_back(index);
+    wolfIndexes.insert(index);
 }
 
 void Cell::addVictim(int index){ 
-    rabbitIndexes.push_back(index); 
+    rabbitIndexes.insert(index); 
 }
 
 bool Cell::getIsThereGrass() const

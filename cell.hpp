@@ -3,10 +3,12 @@
 
 #include <list>
 #include <algorithm>
+#include <unordered_set>
 
+typedef std::unordered_set<int> Indexes;
 class Cell {
-    std::list<int> wolfIndexes;
-    std::list<int> rabbitIndexes;
+    Indexes wolfIndexes;
+    Indexes rabbitIndexes;
     bool isThereGrass;
     bool wolfWasHere;
     bool rabbitWasHere;
@@ -16,21 +18,21 @@ public:
     void addVictim(int index);
     bool getIsThereGrass() const;
     void setIsThereGrass(bool value);
-    
-    std::list<int> getWolfIndexes() const;
-    void setWolfIndexes(const std::list<int> &value);
-    std::list<int> getRabbitIndexes() const;
-    void setRabbitIndexes(const std::list<int> &value);
+    Indexes getWolfIndexes() const;
+    void setWolfIndexes(const Indexes &value);
+    Indexes getRabbitIndexes() const;
+    void setRabbitIndexes(const Indexes &value);
     void removeWolfIndex(int index);
     void removeRabbitIndex(int index);
-    int getLastRabbitIndex() const;
-    void removeLastRabbitIndex();
+    int getFirstRabbitIndex() const;
+    void removeFirstRabbitIndex();
     bool getWolfWasHere() const;
     void setWolfWasHere(bool value);
     bool getRabbitWasHere() const;
     void setRabbitWasHere(bool value);
-    void fixIndexes(int index, bool iswolf = true);
-    const std::list<int> &getWolfIndexesRef();
+    void removeRabbitIndexes(const Indexes& indexes);
+    void removeWolfIndexes(const Indexes& indexes);
+    const Indexes &getWolfIndexesRef();
 };
 
 #endif // CELL_HPP

@@ -8,6 +8,7 @@ public:
     Wolf();
     void makePregnant();   
     void step();
+    void eat();
     bool isAlive();  
     bool operator ==(const Wolf& w);    
     bool operator !=(const Wolf& w);
