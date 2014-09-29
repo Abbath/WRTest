@@ -15,6 +15,6 @@ constexpr int WOLF_PREGNANCY_TIME = 252;
 constexpr int RABBIT_PREGNANCY_TIME = 168;
 constexpr int WOLF_CHILDREN_NUM = 5;
 constexpr int RABBIT_CHILDREN_NUM = 3;
-constexpr int WOLF_NUMBER = 100;
-constexpr int RABBIT_NUMBER = 1000;
+constexpr int WOLF_NUMBER = 40;
+constexpr int RABBIT_NUMBER = 800;
 #endif // DEFS_HPP

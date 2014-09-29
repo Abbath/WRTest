@@ -4,12 +4,12 @@
 Rabbit::Rabbit() : Creature(RABBIT_START_HUNGRY){}
 
 void Rabbit::makePregnant(){ 
-    if(pregnancyTime == 0 && !male) pregnancyTime = RABBIT_PREGNANCY_TIME; 
+    if(pregnancyTime == 0 && !male && age > 365) pregnancyTime = RABBIT_PREGNANCY_TIME; 
 }
 
 void Rabbit::eat()
 {
-    if(hungry < RABBIT_START_HUNGRY) hungry+=4*3;
+    if(hungry < RABBIT_START_HUNGRY) hungry+=4*2;
 }
 
 void Rabbit::step(){ 

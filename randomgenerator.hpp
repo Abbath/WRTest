@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <random>
+#include <chrono>
 
 class RandomGenerator
 {

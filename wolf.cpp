@@ -5,7 +5,7 @@
 Wolf::Wolf() : Creature(WOLF_START_HUNGRY){}
 
 void Wolf::makePregnant(){ 
-    if(pregnancyTime == 0 && !male) pregnancyTime = WOLF_PREGNANCY_TIME; 
+    if(pregnancyTime == 0 && !male && age > 365*1.3) pregnancyTime = WOLF_PREGNANCY_TIME; 
 }
 
 void Wolf::step(){ 
@@ -43,7 +43,7 @@ void Wolf::step(){
 
 void Wolf::eat()
 {
-    if(hungry < WOLF_START_HUNGRY) hungry+=4*7;
+    if(hungry < WOLF_START_HUNGRY) hungry+=4*9;
 }
 
 bool Wolf::isAlive() {

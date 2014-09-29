@@ -13,7 +13,7 @@ Cell &Field::getCell(Coords c)
 }
 
 bool Field::isEmpty(){
-    return creaturesCounter == 0; 
+    return rabbits.size() < 3 || wolfs.size() < 3; 
 }
 
 void Field::generatePopulations(){
@@ -42,26 +42,27 @@ void Field::generatePopulations(){
 }
 
 void Field::print(){
-    for (int i = 0; i < FIELD_WIDTH ; ++i) {
-        for (int j = 0; j < FIELD_HEIGHT; ++j) {
-            if(cells[i][j].getWolfIndexes().size() && cells[i][j].getRabbitIndexes().size()){
-                std::cout << "B";
-            }else if(cells[i][j].getWolfIndexes().size()){
-                std::cout << "W";
-            }else if(cells[i][j].getRabbitIndexes().size()){
-                std::cout << "R";
-            }else if(wasWolfHere(Coords(std::make_pair(i, j)))){
-                std::cout << "!";
-            }else if(wasRabbitHere(Coords(std::make_pair(i,j)))){
-                std::cout << "?";
-            }else if(cells[i][j].isThereGrass()){
-                std::cout << ",";
-            }else{
-                std::cout << ".";
-            }
-        }
-        std::cout << std::endl;
-    }
+//    for (int i = 0; i < FIELD_WIDTH ; ++i) {
+//        for (int j = 0; j < FIELD_HEIGHT; ++j) {
+//            if(getCell(Coords(std::make_pair(i, j))).getWolfIndexes().size() &&
+//                    getCell(Coords(std::make_pair(i, j))).getRabbitIndexes().size()){
+//                std::cout << "B";
+//            }else if(getCell(Coords(std::make_pair(i, j))).getWolfIndexes().size()){
+//                std::cout << "W";
+//            }else if(getCell(Coords(std::make_pair(i, j))).getRabbitIndexes().size()){
+//                std::cout << "R";
+//            }else if(wasWolfHere(Coords(std::make_pair(i, j)))){
+//                std::cout << "!";
+//            }else if(wasRabbitHere(Coords(std::make_pair(i,j)))){
+//                std::cout << "?";
+//            }else if(getCell(Coords(std::make_pair(i, j))).isThereGrass()){
+//                std::cout << ",";
+//            }else{
+//                std::cout << ".";
+//            }
+//        }
+//        std::cout << std::endl;
+//    }
     std::cout << "Step: "<< stepCounter << 
                  " W: " << wolfs.size() << 
                  " R: " << rabbits.size() <<  
@@ -198,6 +199,8 @@ void Field::step(){
     cleanDead(itdw, itdr);
     fixCoords();
     stepCounter++;
+    rabbitNumbers.push_back(rabbits.size());
+    wolfsNumbers.push_back(wolfs.size()); 
 }
 
 void Field::check()
@@ -228,6 +231,16 @@ void Field::check()
             allCreatureCounter++;
         }
     }
+}
+
+void Field::write()
+{
+    std::ofstream out("WR" + std::to_string(RandomGenerator::dice()) + ".dat");
+    for(auto it = rabbitNumbers.begin(), it1 = wolfsNumbers.begin(); it != rabbitNumbers.end(); ++it, ++it1){
+        out << (*it) << " " << (*it1) << std::endl;
+    }
+    rabbitNumbers.clear();
+    wolfsNumbers.clear();
 }
 
 bool Field::wasWolfHere(Coords p, int index)

@@ -9,11 +9,15 @@
 #include <deque>
 #include <unordered_map>
 #include <list>
+#include <fstream>
+#include <string>
 
 class Field {
     std::vector<std::vector<Cell>> cells;
     std::unordered_map<int, Wolf> wolfs;
     std::unordered_map<int, Rabbit> rabbits;
+    std::list<int> wolfsNumbers;
+    std::list<int> rabbitNumbers;
     int creaturesCounter; 
     int allCreatureCounter = 0;
     int deadRabbits = 0;
@@ -33,6 +37,7 @@ public:
     void bornNew(const Indexes& neww, const Indexes& newr);
     void step();
     void check();
+    void write();
     bool wasWolfHere(Coords p, int index = -1);
     bool wasRabbitHere(Coords p, int index = -1);
     void wolfWasHere(Coords p, int index);

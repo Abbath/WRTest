@@ -90,7 +90,7 @@ void Cell::decreaseRabbitSmell()
 
 void Cell::growGrass()
 {
-    if(grass < 144) grass++;
+    if(grass < 24) grass++;
 }
 
 void Cell::eatGrass()
