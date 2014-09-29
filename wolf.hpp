@@ -12,7 +12,6 @@ public:
     bool isAlive();  
     bool operator ==(const Wolf& w);    
     bool operator !=(const Wolf& w);
-    void fixCoords();
 };
 
 #endif // WOLF_HPP

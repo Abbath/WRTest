@@ -1,14 +1,33 @@
 #include "cell.hpp"
 
 
-bool Cell::getRabbitWasHere() const
+bool Cell::detectCreaturesSmell(const Smells& smells, int index) const
 {
-    return rabbitWasHere;
+    if ( smells.empty() ) { return false; }
+    if ( smells.find(index) == smells.end() ) { return true; } // This creature don't smell here
+    if (  ( smells.find(index) != smells.end() ) && smells.size() > 1 ) { return true; }    
+    return false;
 }
 
-void Cell::setRabbitWasHere(bool value)
+bool Cell::getRabbitWasHere(int index) const
 {
-    rabbitWasHere = value;
+    return detectCreaturesSmell(rabbitSmells, index);
+}
+
+bool Cell::getWolfWasHere(int index) const
+{
+    return detectCreaturesSmell(wolfSmells, index);
+}
+
+void Cell::setRabbitWasHere(bool value, int index)
+{
+    if(value){
+        rabbitSmells[index] = 10;
+        //rabbitSmell = 10;
+    }else{
+        rabbitSmells.clear();
+        //rabbitSmell = 0;
+    }
 }
 
 void Cell::removeRabbitIndexes(const Indexes &indexes)
@@ -25,7 +44,7 @@ void Cell::removeWolfIndexes(const Indexes &indexes)
     }
 }
 
-Cell::Cell(): isThereGrass(true){
+Cell::Cell(): grass(144){
     
 }
 
@@ -37,6 +56,43 @@ Indexes Cell::getWolfIndexes() const
 const Indexes& Cell::getWolfIndexesRef()
 {
     return wolfIndexes;
+}
+
+void Cell::decreaseWolfSmell()
+{
+    Indexes itdw;
+    for (auto it = wolfSmells.begin(); it != wolfSmells.end(); ++it) {
+        if(it->first) it->second--;
+        else itdw.insert(it->first);
+    }
+    for(auto x : itdw){
+        wolfSmells.erase(x);
+    }
+}
+
+void Cell::decreaseRabbitSmell()
+{
+    Indexes itdr;
+    for(auto it = rabbitSmells.begin(); it != rabbitSmells.end(); ++it){        
+        if(it->first) it->second--;
+        else itdr.insert(it->first);
+    }
+    for(auto x : itdr){
+        rabbitSmells.erase(x);
+    }
+}
+
+void Cell::growGrass()
+{
+    if(grass < 144) grass++;
+}
+
+void Cell::eatGrass()
+{
+    if(grass > 12) 
+        grass-=12;
+    else
+        grass = 0;
 }
 
 void Cell::setWolfIndexes(const Indexes &value)
@@ -70,14 +126,14 @@ void Cell::removeFirstRabbitIndex() {
     rabbitIndexes.erase(rabbitIndexes.begin());
 }
 
-bool Cell::getWolfWasHere() const
-{
-    return wolfWasHere;
-}
 
-void Cell::setWolfWasHere(bool value)
+void Cell::setWolfWasHere(bool value, int index)
 {
-    wolfWasHere = value;
+    if(value){
+        wolfSmells[index] = 10;
+    }else{
+        wolfSmells.clear();
+    }
 }
 
 void Cell::addPredator(int index){ 
@@ -88,12 +144,12 @@ void Cell::addVictim(int index){
     rabbitIndexes.insert(index); 
 }
 
-bool Cell::getIsThereGrass() const
+bool Cell::isThereGrass() const
 {
-    return isThereGrass;
+    return grass >= 12;
 }
 
-void Cell::setIsThereGrass(bool value)
+void Cell::setGrass(bool value)
 {
-    isThereGrass = value;
+    grass = value;
 }

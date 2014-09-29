@@ -12,7 +12,6 @@ public:
     bool isAlive();   
     bool operator ==(const Rabbit& r);
     bool operator !=(const Rabbit& r);
-    void fixCoords();
 };
 
 #endif // RABBIT_HPP

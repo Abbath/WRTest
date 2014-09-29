@@ -1,12 +1,12 @@
 #include "field.hpp"
 
 Field::Field() : creaturesCounter(0), stepCounter(0){  
-    cells.resize(FIELD_SIZE);
+    cells.resize(FIELD_WIDTH);
     for(auto& x : cells) {
-        x.resize(FIELD_SIZE);
+        x.resize(FIELD_HEIGHT);
     }
     std::default_random_engine engine;
-    std::uniform_int_distribution<int> distribution(0,FIELD_SIZE-1);
+    std::uniform_int_distribution<int> distribution(0,FIELD_WIDTH+FIELD_HEIGHT);
     dice = std::bind(distribution, engine);
 }
 
@@ -17,20 +17,20 @@ bool Field::isEmpty(){
 void Field::generatePopulations(){
     for (int i = 0; i < prCount; ++i) {
         Wolf w;
-        int x = dice();
-        int y = dice();
+        int x = dice() % FIELD_WIDTH;
+        int y = dice() % FIELD_HEIGHT;
         w.setField(this);
-        w.setCoords(std::make_pair(x,y));
+        w.setCoords(Coords(std::make_pair(x,y)));
         wolfsMap[w.getId()] = w;
         cells[x][y].addPredator(w.getId());
         creaturesCounter++;
     }
     for (int i = 0; i < viCount; ++i) {
         Rabbit r;
-        int x = dice();
-        int y = dice();
+        int x = dice() % FIELD_WIDTH;
+        int y = dice() % FIELD_HEIGHT;
         r.setField(this);
-        r.setCoords(std::make_pair(x,y));
+        r.setCoords(Coords(std::make_pair(x,y)));
         rabbitsMap[r.getId()] = r;
         cells[x][y].addVictim(r.getId());
         creaturesCounter++;            
@@ -38,19 +38,19 @@ void Field::generatePopulations(){
 }
 
 void Field::print(){
-    for (int i = 0; i < FIELD_SIZE ; ++i) {
-        for (int j = 0; j < FIELD_SIZE; ++j) {
+    for (int i = 0; i < FIELD_WIDTH ; ++i) {
+        for (int j = 0; j < FIELD_HEIGHT; ++j) {
             if(cells[i][j].getWolfIndexes().size() && cells[i][j].getRabbitIndexes().size()){
                 std::cout << "B";
             }else if(cells[i][j].getWolfIndexes().size()){
                 std::cout << "W";
             }else if(cells[i][j].getRabbitIndexes().size()){
                 std::cout << "R";
-            }else if(wasWolfHere({i,j})){
+            }else if(wasWolfHere(Coords(std::make_pair(i, j)))){
                 std::cout << "!";
-            }else if(wasRabbitHere({i,j})){
+            }else if(wasRabbitHere(Coords(std::make_pair(i,j)))){
                 std::cout << "?";
-            }else if(cells[i][j].getIsThereGrass()){
+            }else if(cells[i][j].isThereGrass()){
                 std::cout << ",";
             }else{
                 std::cout << ".";
@@ -59,28 +59,6 @@ void Field::print(){
         std::cout << std::endl;
     }
     std::cout << "Step: "<< stepCounter << " W: " << wolfsMap.size() << " R: " << rabbitsMap.size() <<  " CC:" << creaturesCounter << std::endl;
-}
-
-void Field::feedRabbits(Cell &c){
-    for (auto x : c.getRabbitIndexes()) {
-        rabbitsMap[x].eat();
-    }     
-}
-
-void Field::feedWolfs(Cell &c){
-    auto wi = c.getWolfIndexesRef().begin();
-    for (unsigned i = 0; i < c.getWolfIndexes().size() ; ++i) {
-        wolfsMap[*(wi++)].eat();
-        if(!c.getRabbitIndexes().empty()){
-            //std::cout << "Rabbit " <<  c.getFirstRabbitIndex() << " was eaten!" << std::endl;
-            int index = c.getFirstRabbitIndex();
-            rabbitsMap.erase(index);
-            c.removeFirstRabbitIndex();
-            creaturesCounter--;
-        }else{
-            break;
-        }
-    }
 }
 
 void Field::fixCoords(){
@@ -149,23 +127,22 @@ void Field::step(){
     for(int i = 0; i < int(cells.size()); ++i){
         for (int j = 0; j < int(cells[i].size()); ++j) {
             Cell& c =  cells[i][j];
-            if(!c.getRabbitIndexes().empty()){
-                if(c.getIsThereGrass()){
-                    feedRabbits(c);
-                }
-                c.setIsThereGrass(false);
-                if(!c.getWolfIndexes().empty()){
-                    feedWolfs(c);
-                }
-            }else{
-                c.setIsThereGrass(true);
-            }
+            c.growGrass();
+            c.decreaseRabbitSmell();
+            c.decreaseWolfSmell();
         }
     }
     Indexes itdw;
     Indexes neww;
     for(auto it = wolfsMap.begin(); it != wolfsMap.end(); ++it){
-        if(getCreatureCell(it->second.getCoords()).getWolfIndexes().size() > 1){
+        Cell& c = getCreatureCell(it->second.getCoords());
+        if(!c.getRabbitIndexes().empty()){
+            it->second.eat();
+            rabbitsMap.erase(c.getFirstRabbitIndex());
+            c.removeFirstRabbitIndex();
+            creaturesCounter--;
+        }
+        if(c.getWolfIndexes().size() > 1){
             it->second.makePregnant(); 
         }
         if(it->second.timeToGiveBirth()){
@@ -180,7 +157,12 @@ void Field::step(){
     Indexes itdr;
     Indexes newr;
     for(auto it = rabbitsMap.begin(); it != rabbitsMap.end(); ++it){
-        if(getCreatureCell(it->second.getCoords()).getRabbitIndexes().size() > 1){
+        Cell& c = getCreatureCell(it->second.getCoords());
+        if(c.isThereGrass()){
+            it->second.eat();
+            c.eatGrass();
+        }
+        if(c.getRabbitIndexes().size() > 1){
            it->second.makePregnant(); 
         }
         if(it->second.timeToGiveBirth()){
@@ -198,29 +180,29 @@ void Field::step(){
     stepCounter++;
 }
 
-bool Field::wasWolfHere(std::pair<int, int> p)
+bool Field::wasWolfHere(Coords p, int index)
 {
-    return cells[p.first][p.second].getWolfWasHere();
+    return cells[p.x()][p.y()].getWolfWasHere(index);
 }
 
-bool Field::wasRabbitHere(std::pair<int, int> p)
+bool Field::wasRabbitHere(Coords p, int index)
 {
-    return cells[p.first][p.second].getRabbitWasHere();
+    return cells[p.x()][p.y()].getRabbitWasHere(index);
 }
 
-void Field::wolfWasHere(std::pair<int, int> p)
+void Field::wolfWasHere(Coords p, int index)
 {
-    cells[p.first][p.second].setWolfWasHere(true);
-    cells[p.first][p.second].setRabbitWasHere(false);
+    cells[p.x()][p.y()].setWolfWasHere(true, index);
+    cells[p.x()][p.y()].setRabbitWasHere(false, index);
 }
 
-void Field::rabbitWasHere(std::pair<int, int> p)
+void Field::rabbitWasHere(Coords p, int index)
 {
-    cells[p.first][p.second].setWolfWasHere(false);
-    cells[p.first][p.second].setRabbitWasHere(true);
+    cells[p.x()][p.y()].setWolfWasHere(false, index);
+    cells[p.x()][p.y()].setRabbitWasHere(true, index);
 }
 
-Cell &Field::getCreatureCell(std::pair<int, int> coords)
+Cell &Field::getCreatureCell(Coords coords)
 {
-    return cells[coords.first][coords.second];
+    return cells[coords.x()][coords.y()];
 }

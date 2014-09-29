@@ -5,13 +5,16 @@
 #include <ctime>
 #include <cstdlib>
 #include "defs.hpp"
+#include "coords.hpp"
+
 class Field;
 
 class Creature{
 protected:
     int idx;
     int parentId;
-    std::pair<int, int> coords;
+    //std::pair<int, int> coords;
+    Coords coords;
     bool male;
     int hungry;
     int age;
@@ -22,8 +25,8 @@ public:
     Creature(int _hungry);
     Creature() : Creature(1) {}
     virtual ~Creature(){}
-    virtual std::pair<int, int> getCoords() const;
-    virtual void setCoords(const std::pair<int, int> &value);
+    virtual Coords getCoords() const;
+    virtual void setCoords(const Coords &value);
     virtual bool isMale() const;
     virtual void setIsMale(bool value);
     virtual bool timeToGiveBirth();
@@ -38,7 +41,6 @@ public:
     virtual void step() = 0;
     virtual bool operator ==(const Creature &r);
     virtual bool operator !=(const Creature &r);    
-    virtual void fixCoords(int &newx, int &newy);
 };
 
 #endif // CREATURE_HPP

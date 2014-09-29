@@ -6,13 +6,22 @@ int main()
     srand(time(0));
     Field field;
     field.generatePopulations();
-    while(!field.isEmpty()){
+    while(true){
         field.step();
         field.print();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        if(field.isEmpty()){
+            field.generatePopulations();
+        } 
     }
     return 0;
 }
+
+
+
+
+
+
 
 
 

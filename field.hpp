@@ -25,16 +25,14 @@ public:
     bool isEmpty(); 
     void generatePopulations();
     void print();
-    void feedRabbits(Cell& c);
-    void feedWolfs(Cell& c);
     void fixCoords();
     void cleanDead(Indexes itdw, Indexes itdr);
     void bornNew(const Indexes& neww, const Indexes& newr);
     void step();
-    bool wasWolfHere(std::pair<int, int> p);
-    bool wasRabbitHere(std::pair<int, int> p);
-    void wolfWasHere(std::pair<int, int> p);
-    void rabbitWasHere(std::pair<int, int> p);
-    Cell& getCreatureCell(std::pair<int, int> coords);
+    bool wasWolfHere(Coords p, int index = -1);
+    bool wasRabbitHere(Coords p, int index = -1);
+    void wolfWasHere(Coords p, int index);
+    void rabbitWasHere(Coords p, int index);
+    Cell& getCreatureCell(Coords coords);
 };
 #endif // FIELD_HPP

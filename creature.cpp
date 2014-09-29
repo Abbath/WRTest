@@ -1,6 +1,7 @@
 #include "creature.hpp"
 #include "field.hpp"
 #include <cassert>
+
 int Creature::getid(){
     static int id = 0;
     return id++;
@@ -60,25 +61,13 @@ void Creature::setField(Field *value)
     assert(value);
     field = value;
 }
-std::pair<int, int> Creature::getCoords() const
+Coords Creature::getCoords() const
 {
     return coords;
 }
 
-void Creature::setCoords(const std::pair<int, int> &value)
+void Creature::setCoords(const Coords &value)
 {
     coords = value;
 }
 
-void Creature::fixCoords(int& newx, int& newy){
-    if(newx < 0)
-        newx = 0;
-    if(newy < 0)
-        newy = 0;
-    if(newx > FIELD_SIZE - 1){
-        newx = FIELD_SIZE - 1;
-    }
-    if(newy > FIELD_SIZE - 1){
-        newy = FIELD_SIZE - 1;
-    }
-}

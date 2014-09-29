@@ -8,7 +8,8 @@ SOURCES += main.cpp \
     wolf.cpp \
     rabbit.cpp \
     cell.cpp \
-    field.cpp
+    field.cpp \
+    coords.cpp
 
 include(deployment.pri)
 qtcAddDeployment()
@@ -21,4 +22,5 @@ HEADERS += \
     defs.hpp \
     rabbit.hpp \
     cell.hpp \
-    field.hpp
+    field.hpp \
+    coords.hpp
