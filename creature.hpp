@@ -13,7 +13,6 @@ class Creature{
 protected:
     int idx;
     int parentId;
-    //std::pair<int, int> coords;
     Coords coords;
     bool male;
     int hungry;
@@ -39,6 +38,7 @@ public:
     virtual Field *getField() const;
     virtual void setField(Field *value);
     virtual void step() = 0;
+    virtual bool isHungry();
     virtual bool operator ==(const Creature &r);
     virtual bool operator !=(const Creature &r);    
 };

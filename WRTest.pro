@@ -9,7 +9,8 @@ SOURCES += main.cpp \
     rabbit.cpp \
     cell.cpp \
     field.cpp \
-    coords.cpp
+    coords.cpp \
+    randomgenerator.cpp
 
 include(deployment.pri)
 qtcAddDeployment()
@@ -23,4 +24,5 @@ HEADERS += \
     rabbit.hpp \
     cell.hpp \
     field.hpp \
-    coords.hpp
+    coords.hpp \
+    randomgenerator.hpp

@@ -4,8 +4,8 @@
 bool Cell::detectCreaturesSmell(const Smells& smells, int index) const
 {
     if ( smells.empty() ) { return false; }
-    if ( smells.find(index) == smells.end() ) { return true; } // This creature don't smell here
-    if (  ( smells.find(index) != smells.end() ) && smells.size() > 1 ) { return true; }    
+    if ( smells.find(index) == smells.end() ) { return true; }
+    if ( ( smells.find(index) != smells.end() ) && smells.size() > 1 ) { return true; }    
     return false;
 }
 
@@ -23,10 +23,8 @@ void Cell::setRabbitWasHere(bool value, int index)
 {
     if(value){
         rabbitSmells[index] = 10;
-        //rabbitSmell = 10;
     }else{
         rabbitSmells.clear();
-        //rabbitSmell = 0;
     }
 }
 
@@ -62,11 +60,15 @@ void Cell::decreaseWolfSmell()
 {
     Indexes itdw;
     for (auto it = wolfSmells.begin(); it != wolfSmells.end(); ++it) {
-        if(it->first) it->second--;
-        else itdw.insert(it->first);
+        if(it->second){
+            it->second--;
+        }
+        else{ 
+            itdw.insert(it->first);
+        }
     }
-    for(auto x : itdw){
-        wolfSmells.erase(x);
+    for(auto it = itdw.begin(); it  !=  itdw.end(); ++it){
+        wolfSmells.erase(*it);
     }
 }
 
@@ -74,11 +76,15 @@ void Cell::decreaseRabbitSmell()
 {
     Indexes itdr;
     for(auto it = rabbitSmells.begin(); it != rabbitSmells.end(); ++it){        
-        if(it->first) it->second--;
-        else itdr.insert(it->first);
+        if(it->second){ 
+            it->second--;
+        }
+        else{ 
+            itdr.insert(it->first);
+        }
     }
-    for(auto x : itdr){
-        rabbitSmells.erase(x);
+    for(auto it = itdr.begin(); it != itdr.end(); ++it){
+        rabbitSmells.erase(*it);
     }
 }
 

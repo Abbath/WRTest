@@ -12,16 +12,19 @@
 
 class Field {
     std::vector<std::vector<Cell>> cells;
-    std::unordered_map<int, Wolf> wolfsMap;
-    std::unordered_map<int, Rabbit> rabbitsMap;
-    int creaturesCounter;    
+    std::unordered_map<int, Wolf> wolfs;
+    std::unordered_map<int, Rabbit> rabbits;
+    int creaturesCounter; 
+    int allCreatureCounter = 0;
+    int deadRabbits = 0;
+    int deadWolfs = 0;
+    int eatenRabbits = 0;
     int stepCounter;
     static constexpr int prCount = WOLF_NUMBER;
     static constexpr int viCount = RABBIT_NUMBER;
-    std::function<int()> dice;
 public:
     Field();
-    Cell getCell(int x, int y);
+    Cell& getCell(Coords c);
     bool isEmpty(); 
     void generatePopulations();
     void print();
@@ -29,6 +32,7 @@ public:
     void cleanDead(Indexes itdw, Indexes itdr);
     void bornNew(const Indexes& neww, const Indexes& newr);
     void step();
+    void check();
     bool wasWolfHere(Coords p, int index = -1);
     bool wasRabbitHere(Coords p, int index = -1);
     void wolfWasHere(Coords p, int index);

@@ -61,6 +61,11 @@ void Creature::setField(Field *value)
     assert(value);
     field = value;
 }
+
+bool Creature::isHungry()
+{
+    return hungry < WOLF_START_HUNGRY;
+}
 Coords Creature::getCoords() const
 {
     return coords;
