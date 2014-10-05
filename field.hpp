@@ -11,8 +11,11 @@
 #include <list>
 #include <fstream>
 #include <string>
+#include <QRunnable>
+#include <QObject>
 
-class Field {
+class Field : public QObject, public QRunnable{
+    Q_OBJECT
     std::vector<std::vector<Cell>> cells;
     std::unordered_map<int, Wolf> wolfs;
     std::unordered_map<int, Rabbit> rabbits;
@@ -27,8 +30,9 @@ class Field {
     static constexpr int prCount = WOLF_NUMBER;
     static constexpr int viCount = RABBIT_NUMBER;
 public:
-    Field();
+    explicit Field(QObject* parent);
     Cell& getCell(Coords c);
+    std::vector<std::vector<Cell>>& getCells();
     bool isEmpty(); 
     void generatePopulations();
     void print();
@@ -43,5 +47,8 @@ public:
     void wolfWasHere(Coords p, int index);
     void rabbitWasHere(Coords p, int index);
     Cell& getCreatureCell(Coords coords);
+    void run();
+signals:
+    void nextStep();
 };
 #endif // FIELD_HPP

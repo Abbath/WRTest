@@ -1,15 +1,23 @@
 #include "field.hpp"
+#include <QThread>
 
-Field::Field() : creaturesCounter(0), stepCounter(0){  
+Field::Field(QObject *parent) : QObject(parent), creaturesCounter(0), stepCounter(0){  
+    setAutoDelete(false);
     cells.resize(FIELD_WIDTH);
     for(auto& x : cells) {
         x.resize(FIELD_HEIGHT);
     }
+    generatePopulations();
 }
 
 Cell &Field::getCell(Coords c)
 {
     return cells[c.x()][c.y()];
+}
+
+std::vector<std::vector<Cell> > &Field::getCells()
+{
+    return cells;
 }
 
 bool Field::isEmpty(){
@@ -19,8 +27,8 @@ bool Field::isEmpty(){
 void Field::generatePopulations(){
     for (int i = 0; i < prCount; ++i) {
         Wolf w;
-        int x = RandomGenerator::dice() % FIELD_WIDTH;
-        int y = RandomGenerator::dice() % FIELD_HEIGHT;
+        int x = rand() % FIELD_WIDTH;
+        int y = rand() % FIELD_HEIGHT;
         w.setField(this);
         w.setCoords(Coords(std::make_pair(x,y)));
         wolfs[w.getId()] = w;
@@ -30,8 +38,8 @@ void Field::generatePopulations(){
     }
     for (int i = 0; i < viCount; ++i) {
         Rabbit r;
-        int x = RandomGenerator::dice() % FIELD_WIDTH;
-        int y = RandomGenerator::dice() % FIELD_HEIGHT;
+        int x = rand() % FIELD_WIDTH;
+        int y = rand() % FIELD_HEIGHT;
         r.setField(this);
         r.setCoords(Coords(std::make_pair(x,y)));
         rabbits[r.getId()] = r;
@@ -208,8 +216,8 @@ void Field::check()
     if(rabbits.empty()){
         for (int i = 0; i < viCount; ++i) {
             Rabbit r;
-            int x = RandomGenerator::dice() % FIELD_WIDTH;
-            int y = RandomGenerator::dice() % FIELD_HEIGHT;
+            int x = rand() % FIELD_WIDTH;
+            int y = rand() % FIELD_HEIGHT;
             r.setField(this);
             r.setCoords(Coords(std::make_pair(x,y)));
             rabbits[r.getId()] = r;
@@ -221,8 +229,8 @@ void Field::check()
     if(wolfs.empty()){
         for (int i = 0; i < prCount; ++i) {
             Wolf w;
-            int x = RandomGenerator::dice() % FIELD_WIDTH;
-            int y = RandomGenerator::dice() % FIELD_HEIGHT;
+            int x = rand() % FIELD_WIDTH;
+            int y = rand() % FIELD_HEIGHT;
             w.setField(this);
             w.setCoords(Coords(std::make_pair(x,y)));
             wolfs[w.getId()] = w;
@@ -235,7 +243,7 @@ void Field::check()
 
 void Field::write()
 {
-    std::ofstream out("WR" + std::to_string(RandomGenerator::dice()) + ".dat");
+    std::ofstream out("WR" + std::to_string(rand()) + ".dat");
     for(auto it = rabbitNumbers.begin(), it1 = wolfsNumbers.begin(); it != rabbitNumbers.end(); ++it, ++it1){
         out << (*it) << " " << (*it1) << std::endl;
     }
@@ -268,4 +276,17 @@ void Field::rabbitWasHere(Coords p, int index)
 Cell &Field::getCreatureCell(Coords coords)
 {
     return cells[coords.x()][coords.y()];
+}
+
+void Field::run()
+{
+    while(true){
+        step();
+        emit nextStep();
+        if(isEmpty()){
+            write();
+            generatePopulations();
+        } 
+        QThread::currentThread()->msleep(100);
+    }
 }

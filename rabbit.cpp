@@ -19,8 +19,8 @@ void Rabbit::step(){
     age++;
     if(!field->getCell(coords).isThereGrass() || field->getCell(coords).getRabbitIndexes().size() < 2){
         for(int i = 0; i < 8; ++i){
-            int a = RandomGenerator::dice() % 3 - 1;
-            int b = RandomGenerator::dice() % 3 - 1;
+            int a = rand() % 3 - 1;
+            int b = rand() % 3 - 1;
             int newx = coords.x() + a;
             int newy = coords.y() + b;
             Coords::fixCoords(newx, newy);
@@ -32,8 +32,8 @@ void Rabbit::step(){
             }
         }
         for(int i = 0; i < 8; ++i){
-            int newx = coords.x() + (RandomGenerator::dice() % 3 - 1);
-            int newy = coords.y() + (RandomGenerator::dice() % 3 - 1);
+            int newx = coords.x() + (rand() % 3 - 1);
+            int newy = coords.y() + (rand() % 3 - 1);
             Coords::fixCoords(newx, newy);
             if(field->getCell(coords).isThereGrass()){
                 coords = Coords(std::make_pair(newx, newy));
@@ -42,8 +42,8 @@ void Rabbit::step(){
             }
         }
         for(int i = 0; i < 8; ++i){
-            int newx = coords.x() + (RandomGenerator::dice() % 3 - 1);
-            int newy = coords.y() + (RandomGenerator::dice() % 3 - 1);
+            int newx = coords.x() + (rand() % 3 - 1);
+            int newy = coords.y() + (rand() % 3 - 1);
             Coords::fixCoords(newx, newy);
             if(field->wasRabbitHere(std::make_pair(newx, newy), idx)){
                 coords = Coords(std::make_pair(newx, newy));
@@ -52,8 +52,8 @@ void Rabbit::step(){
             }
         }
     }
-    if(RandomGenerator::dice() < std::numeric_limits<int>::max() / 7.0){
-        direction = std::make_pair(RandomGenerator::dice() % 3 - 1 , RandomGenerator::dice() % 3 - 1);
+    if(rand() < std::numeric_limits<int>::max() / 7.0){
+        direction = std::make_pair(rand() % 3 - 1 , rand() % 3 - 1);
     }
     coords += direction;
     field->rabbitWasHere(coords, idx);

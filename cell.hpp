@@ -6,8 +6,10 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <map>
+#include <set>
+#include "defs.hpp"
 
-typedef std::unordered_set<int> Indexes;
+typedef std::set<int> Indexes;
 typedef std::map<int, unsigned int> Smells;
 
 class Cell {
@@ -16,6 +18,7 @@ class Cell {
     Smells wolfSmells;
     Smells rabbitSmells;
     unsigned grass;
+    unsigned totalSmell;
 public:
     Cell();
     void addPredator(int index);
@@ -43,6 +46,8 @@ public:
     void eatGrass();
     void detectCreaturesSmell(int index, bool result) const;
     bool detectCreaturesSmell(const Smells &smells, int index) const;
+    unsigned getTotalSmell() const;
+    void setTotalSmell(const unsigned &value);
 };
 
 #endif // CELL_HPP

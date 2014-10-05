@@ -22,9 +22,11 @@ bool Cell::getWolfWasHere(int index) const
 void Cell::setRabbitWasHere(bool value, int index)
 {
     if(value){
-        rabbitSmells[index] = 10;
+        rabbitSmells[index] = RABBIT_SMELL_TIME;
+        totalSmell += RABBIT_SMELL_TIME;
     }else{
         rabbitSmells.clear();
+        totalSmell = 0;
     }
 }
 
@@ -42,7 +44,17 @@ void Cell::removeWolfIndexes(const Indexes &indexes)
     }
 }
 
-Cell::Cell(): grass(144){
+
+unsigned Cell::getTotalSmell() const
+{
+    return totalSmell;
+}
+
+void Cell::setTotalSmell(const unsigned &value)
+{
+    totalSmell = value;
+}
+Cell::Cell(): grass(GRASS_PER_CELL), totalSmell(0){
     
 }
 
@@ -62,6 +74,7 @@ void Cell::decreaseWolfSmell()
     for (auto it = wolfSmells.begin(); it != wolfSmells.end(); ++it) {
         if(it->second){
             it->second--;
+            totalSmell--;
         }
         else{ 
             itdw.insert(it->first);
@@ -78,6 +91,7 @@ void Cell::decreaseRabbitSmell()
     for(auto it = rabbitSmells.begin(); it != rabbitSmells.end(); ++it){        
         if(it->second){ 
             it->second--;
+            totalSmell--;
         }
         else{ 
             itdr.insert(it->first);
@@ -90,13 +104,13 @@ void Cell::decreaseRabbitSmell()
 
 void Cell::growGrass()
 {
-    if(grass < 24) grass++;
+    if(grass < GRASS_PER_CELL) grass++;
 }
 
 void Cell::eatGrass()
 {
-    if(grass > 12) 
-        grass-=12;
+    if(grass > GRASS_PER_RABBIT) 
+        grass-=GRASS_PER_RABBIT;
     else
         grass = 0;
 }
@@ -136,9 +150,11 @@ void Cell::removeFirstRabbitIndex() {
 void Cell::setWolfWasHere(bool value, int index)
 {
     if(value){
-        wolfSmells[index] = 10;
+        wolfSmells[index] = WOLF_SMELL_TIME;
+        totalSmell += WOLF_SMELL_TIME;
     }else{
         wolfSmells.clear();
+        totalSmell = 0;
     }
 }
 
@@ -152,7 +168,7 @@ void Cell::addVictim(int index){
 
 bool Cell::isThereGrass() const
 {
-    return grass >= 12;
+    return grass >= GRASS_PER_RABBIT;
 }
 
 void Cell::setGrass(bool value)

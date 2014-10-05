@@ -17,4 +17,8 @@ constexpr int WOLF_CHILDREN_NUM = 5;
 constexpr int RABBIT_CHILDREN_NUM = 3;
 constexpr int WOLF_NUMBER = 40;
 constexpr int RABBIT_NUMBER = 800;
+constexpr int WOLF_SMELL_TIME = 10;
+constexpr int RABBIT_SMELL_TIME = 10;
+constexpr int GRASS_PER_CELL = 24;
+constexpr int GRASS_PER_RABBIT = 12;
 #endif // DEFS_HPP
