@@ -1,6 +1,10 @@
 #include "field.hpp"
 #include <QThread>
 
+void Field::stop(){
+    running.store(false, std::memory_order_relaxed);
+}
+
 Field::Field(QObject *parent) : QObject(parent), creaturesCounter(0), stepCounter(0){  
     setAutoDelete(false);
     cells.resize(FIELD_WIDTH);
@@ -8,6 +12,7 @@ Field::Field(QObject *parent) : QObject(parent), creaturesCounter(0), stepCounte
         x.resize(FIELD_HEIGHT);
     }
     generatePopulations();
+    running.store(true, std::memory_order_relaxed);
 }
 
 Cell &Field::getCell(Coords c)
@@ -91,6 +96,7 @@ void Field::fixCoords(){
                 if(wolfs[x].getCoords() != cached_pair){
                     getCell(wolfs[x].getCoords()).addPredator(x);
                     itdw.insert(x);
+                    std::cout << "One!\n";
                 }
             }
             c.removeWolfIndexes(itdw);
@@ -280,13 +286,20 @@ Cell &Field::getCreatureCell(Coords coords)
 
 void Field::run()
 {
-    while(true){
+//    static bool first = true;
+//    if(first){
+//        first = false;
+//        running.store(true, std::memory_order_relaxed);
+//    }
+    while(running.load(std::memory_order_relaxed)){
         step();
+        print();
         emit nextStep();
         if(isEmpty()){
+            std::cerr << "All dead!\n";            
             write();
             generatePopulations();
         } 
-        QThread::currentThread()->msleep(100);
+        QThread::currentThread()->msleep(50);
     }
 }

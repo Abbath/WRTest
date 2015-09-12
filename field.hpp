@@ -11,6 +11,7 @@
 #include <list>
 #include <fstream>
 #include <string>
+#include <atomic>
 #include <QRunnable>
 #include <QObject>
 
@@ -27,9 +28,11 @@ class Field : public QObject, public QRunnable{
     int deadWolfs = 0;
     int eatenRabbits = 0;
     int stepCounter;
+    std::atomic_bool running;
     static constexpr int prCount = WOLF_NUMBER;
     static constexpr int viCount = RABBIT_NUMBER;
 public:
+    void stop();
     explicit Field(QObject* parent);
     Cell& getCell(Coords c);
     std::vector<std::vector<Cell>>& getCells();

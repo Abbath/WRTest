@@ -17,9 +17,9 @@ class Cell {
     Indexes rabbitIndexes;
     Smells wolfSmells;
     Smells rabbitSmells;
-    unsigned grass;
     unsigned totalSmell;
 public:
+    unsigned grass;
     Cell();
     void addPredator(int index);
     void addVictim(int index);
