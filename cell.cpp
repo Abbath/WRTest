@@ -1,6 +1,5 @@
 #include "cell.hpp"
 
-
 bool Cell::detectCreaturesSmell(const Smells& smells, int index) const
 {
     if ( smells.empty() ) { return false; }
@@ -44,7 +43,6 @@ void Cell::removeWolfIndexes(const Indexes &indexes)
     }
 }
 
-
 unsigned Cell::getTotalSmell() const
 {
     return totalSmell;
@@ -54,7 +52,8 @@ void Cell::setTotalSmell(const unsigned &value)
 {
     totalSmell = value;
 }
-Cell::Cell(): grass(GRASS_PER_CELL), totalSmell(0){
+
+Cell::Cell(): totalSmell(0),  grass(GRASS_PER_CELL) {
     
 }
 
@@ -74,9 +73,8 @@ void Cell::decreaseWolfSmell()
     for (auto it = wolfSmells.begin(); it != wolfSmells.end(); ++it) {
         if(it->second){
             it->second--;
-            totalSmell--;
-        }
-        else{ 
+            totalSmell = totalSmell ? totalSmell - 1 : totalSmell;
+        }else{
             itdw.insert(it->first);
         }
     }
@@ -91,7 +89,7 @@ void Cell::decreaseRabbitSmell()
     for(auto it = rabbitSmells.begin(); it != rabbitSmells.end(); ++it){        
         if(it->second){ 
             it->second--;
-            totalSmell--;
+            totalSmell = totalSmell ? totalSmell - 1 : totalSmell;
         }
         else{ 
             itdr.insert(it->first);
@@ -104,7 +102,7 @@ void Cell::decreaseRabbitSmell()
 
 void Cell::growGrass()
 {
-    if(grass < GRASS_PER_CELL) grass++;
+    if(grass < GRASS_PER_CELL) grass+=3;
 }
 
 void Cell::eatGrass()

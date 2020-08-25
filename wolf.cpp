@@ -1,6 +1,6 @@
 #include "wolf.hpp"
 #include "field.hpp"
-
+#include "randomgenerator.hpp"
 
 Wolf::Wolf() : Creature(WOLF_START_HUNGRY){}
 
@@ -14,30 +14,35 @@ void Wolf::step(){
     hungry--;
     age++; 
     for(int i = 0; i < 8; ++i){
-        int newx = coords.x() + (rand() % 3 - 1);
-        int newy = coords.y() + (rand() % 3 - 1);
+        int newx = coords.x() + (RandomGenerator::dice() % 3 - 1);
+        int newy = coords.y() + (RandomGenerator::dice() % 3 - 1);
         Coords::fixCoords(newx, newy);
-        if(field->wasRabbitHere(std::make_pair(newx, newy)) || 
-                field->getCreatureCell(std::make_pair(newx, newy)).getRabbitIndexes().size() > 0){
-            coords = Coords(std::make_pair(newx, newy));
-            field->wolfWasHere(coords, idx); 
-            return;
-            
+        if(field->wasRabbitHere({newx, newy}) ||
+           field->getCreatureCell({newx, newy}).getRabbitIndexes().size() > 0){
+            field->getCell(coords).removeWolfIndex(idx);
+            coords = Coords{newx, newy};
+            field->getCell(coords).addPredator(idx);
+            field->wolfWasHere(coords, idx);
+            return; 
         }
         for(int i = 0; i < 3; ++i){
-            int newx = coords.x() + (rand() % 3 - 1);
-            int newy = coords.y() + (rand() % 3 - 1);
+            int newx = coords.x() + (RandomGenerator::dice() % 3 - 1);
+            int newy = coords.y() + (RandomGenerator::dice() % 3 - 1);
             Coords::fixCoords(newx, newy);
-            if(field->wasWolfHere(std::make_pair(newx, newy), idx)){
-                coords = Coords(std::make_pair(newx, newy));
+            if(field->wasWolfHere(std::pair{newx, newy}, idx)){
+                field->getCell(coords).removeWolfIndex(idx);
+                coords = Coords{newx, newy};
+                field->getCell(coords).addPredator(idx);
                 field->wolfWasHere(coords, idx); 
                 return;
             }
         }
-        if(rand() < std::numeric_limits<int>::max() / 50.0){
-            direction = std::make_pair(rand() % 3 - 1, rand() % 3 - 1);
+        if(RandomGenerator::dice() < std::numeric_limits<int>::max() / 50.0){
+            direction = {rand() % 3 - 1, rand() % 3 - 1};
         }
+        field->getCell(coords).removeWolfIndex(idx);
         coords += direction;
+        field->getCell(coords).addPredator(idx);
         field->wolfWasHere(coords, idx);    
     }
 }

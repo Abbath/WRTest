@@ -24,10 +24,12 @@ void Rabbit::step(){
             int newx = coords.x() + a;
             int newy = coords.y() + b;
             Coords::fixCoords(newx, newy);
-            if(field->wasWolfHere(std::make_pair(newx, newy)) || 
-                    field->getCreatureCell(std::make_pair(newx, newy)).getWolfIndexes().size() > 0){
-                coords = Coords(std::make_pair(coords.x() - a, coords.y() - b));
-                field->rabbitWasHere(coords, idx); 
+            if(field->wasWolfHere({newx, newy}) ||
+                    field->getCreatureCell({newx, newy}).getWolfIndexes().size() > 0){
+                field->getCell(coords).removeRabbitIndex(idx);
+                coords = Coords{coords.x() - a, coords.y() - b};
+                field->getCell(coords).addVictim(idx);
+                field->rabbitWasHere(coords, idx);
                 return;
             }
         }
@@ -36,7 +38,9 @@ void Rabbit::step(){
             int newy = coords.y() + (rand() % 3 - 1);
             Coords::fixCoords(newx, newy);
             if(field->getCell(coords).isThereGrass()){
-                coords = Coords(std::make_pair(newx, newy));
+                field->getCell(coords).removeRabbitIndex(idx);
+                coords = Coords{newx, newy};
+                field->getCell(coords).addVictim(idx);
                 field->rabbitWasHere(coords, idx); 
                 return;
             }
@@ -45,17 +49,21 @@ void Rabbit::step(){
             int newx = coords.x() + (rand() % 3 - 1);
             int newy = coords.y() + (rand() % 3 - 1);
             Coords::fixCoords(newx, newy);
-            if(field->wasRabbitHere(std::make_pair(newx, newy), idx)){
-                coords = Coords(std::make_pair(newx, newy));
+            if(field->wasRabbitHere({newx, newy}, idx)){
+                field->getCell(coords).removeRabbitIndex(idx);
+                coords = Coords{newx, newy};
+                field->getCell(coords).addVictim(idx);
                 field->rabbitWasHere(coords, idx); 
                 return;
             }
         }
     }
     if(rand() < std::numeric_limits<int>::max() / 7.0){
-        direction = std::make_pair(rand() % 3 - 1 , rand() % 3 - 1);
+        direction = {rand() % 3 - 1 , rand() % 3 - 1};
     }
+    field->getCell(coords).removeRabbitIndex(idx);
     coords += direction;
+    field->getCell(coords).addVictim(idx);
     field->rabbitWasHere(coords, idx);
 }
 

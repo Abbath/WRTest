@@ -15,9 +15,11 @@
 #include <QRunnable>
 #include <QObject>
 
+using Cells = std::vector<Cell>;
+
 class Field : public QObject, public QRunnable{
     Q_OBJECT
-    std::vector<std::vector<Cell>> cells;
+    Cells cells;
     std::unordered_map<int, Wolf> wolfs;
     std::unordered_map<int, Rabbit> rabbits;
     std::list<int> wolfsNumbers;
@@ -31,11 +33,15 @@ class Field : public QObject, public QRunnable{
     std::atomic_bool running;
     static constexpr int prCount = WOLF_NUMBER;
     static constexpr int viCount = RABBIT_NUMBER;
+    void populateWolfs();
+    void populateRabbits();
+    bool noWolfs();
+    bool noRabbits();
 public:
     void stop();
     explicit Field(QObject* parent);
     Cell& getCell(Coords c);
-    std::vector<std::vector<Cell>>& getCells();
+    Cells &getCells();
     bool isEmpty(); 
     void generatePopulations();
     void print();

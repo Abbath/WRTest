@@ -6,41 +6,36 @@ void Field::stop(){
 }
 
 Field::Field(QObject *parent) : QObject(parent), creaturesCounter(0), stepCounter(0){  
+    RandomGenerator::init();
     setAutoDelete(false);
-    cells.resize(FIELD_WIDTH);
-    for(auto& x : cells) {
-        x.resize(FIELD_HEIGHT);
-    }
+    cells.resize(FIELD_WIDTH * FIELD_HEIGHT);
     generatePopulations();
     running.store(true, std::memory_order_relaxed);
 }
 
 Cell &Field::getCell(Coords c)
 {
-    return cells[c.x()][c.y()];
+    return cells[c.y() * FIELD_WIDTH + c.x()];
 }
 
-std::vector<std::vector<Cell> > &Field::getCells()
+Cells &Field::getCells()
 {
     return cells;
 }
 
 bool Field::isEmpty(){
-    return rabbits.size() < 3 || wolfs.size() < 3; 
+    return rabbits.size() < 3 && wolfs.size() < 3;
 }
 
-void Field::generatePopulations(){
-    for (int i = 0; i < prCount; ++i) {
-        Wolf w;
-        int x = rand() % FIELD_WIDTH;
-        int y = rand() % FIELD_HEIGHT;
-        w.setField(this);
-        w.setCoords(Coords(std::make_pair(x,y)));
-        wolfs[w.getId()] = w;
-        cells[x][y].addPredator(w.getId());
-        creaturesCounter++;
-        allCreatureCounter++;
-    }
+bool Field::noRabbits(){
+    return rabbits.size() < 3;
+}
+
+bool Field::noWolfs(){
+    return wolfs.size() < 3;
+}
+
+void Field::populateRabbits(){
     for (int i = 0; i < viCount; ++i) {
         Rabbit r;
         int x = rand() % FIELD_WIDTH;
@@ -48,10 +43,29 @@ void Field::generatePopulations(){
         r.setField(this);
         r.setCoords(Coords(std::make_pair(x,y)));
         rabbits[r.getId()] = r;
-        cells[x][y].addVictim(r.getId());
-        creaturesCounter++; 
+        cells[y * FIELD_WIDTH + x].addVictim(r.getId());
+        creaturesCounter++;
         allCreatureCounter++;
     }
+}
+
+void Field::populateWolfs(){
+    for (int i = 0; i < prCount; ++i) {
+        Wolf w;
+        int x = rand() % FIELD_WIDTH;
+        int y = rand() % FIELD_HEIGHT;
+        w.setField(this);
+        w.setCoords(Coords(std::make_pair(x,y)));
+        wolfs[w.getId()] = w;
+        cells[y * FIELD_WIDTH + x].addPredator(w.getId());
+        creaturesCounter++;
+        allCreatureCounter++;
+    }
+}
+
+void Field::generatePopulations(){
+    populateWolfs();
+    populateRabbits();
 }
 
 void Field::print(){
@@ -87,16 +101,15 @@ void Field::print(){
 }
 
 void Field::fixCoords(){
-    for(int i = 0; i < int(cells.size()); ++i){
-        for (int j = 0; j < int(cells[i].size()); ++j) {
-            Cell& c =  cells[i][j];
+    for(int i = 0; i < FIELD_WIDTH; ++i){
+        for (int j = 0; j < FIELD_HEIGHT; ++j) {
+            Cell& c =  cells[j * FIELD_WIDTH + i];
             const auto cached_pair = std::make_pair(i, j);
             Indexes itdw;
             for(int x : c.getWolfIndexes()){
                 if(wolfs[x].getCoords() != cached_pair){
                     getCell(wolfs[x].getCoords()).addPredator(x);
                     itdw.insert(x);
-                    std::cout << "One!\n";
                 }
             }
             c.removeWolfIndexes(itdw);
@@ -158,9 +171,9 @@ void Field::bornNew(const Indexes &neww, const Indexes &newr)
 }
 
 void Field::step(){
-    for(int i = 0; i < int(cells.size()); ++i){
-        for (int j = 0; j < int(cells[i].size()); ++j) {
-            Cell& c =  cells[i][j];
+    for(int i = 0; i < FIELD_WIDTH; ++i){
+        for (int j = 0; j < FIELD_HEIGHT; ++j) {
+            Cell& c =  cells[j * FIELD_WIDTH + i];
             c.growGrass();
             c.decreaseRabbitSmell();
             c.decreaseWolfSmell();
@@ -171,11 +184,13 @@ void Field::step(){
     for(auto it = wolfs.begin(); it != wolfs.end(); ++it){
         Cell& c = getCell(it->second.getCoords());
         if(!c.getRabbitIndexes().empty() && it->second.isHungry()){
-            it->second.eat();
-            rabbits.erase(c.getFirstRabbitIndex());
-            c.removeFirstRabbitIndex();
-            creaturesCounter--;
-            eatenRabbits++;
+            if(RandomGenerator::dice2() < 0.5){
+                it->second.eat();
+                rabbits.erase(c.getFirstRabbitIndex());
+                c.removeFirstRabbitIndex();
+                creaturesCounter--;
+                eatenRabbits++;
+            }
         }
         if(c.getWolfIndexes().size() > 1){
             it->second.makePregnant(); 
@@ -211,7 +226,7 @@ void Field::step(){
     }  
     bornNew(neww, newr);
     cleanDead(itdw, itdr);
-    fixCoords();
+//    fixCoords();
     stepCounter++;
     rabbitNumbers.push_back(rabbits.size());
     wolfsNumbers.push_back(wolfs.size()); 
@@ -227,7 +242,7 @@ void Field::check()
             r.setField(this);
             r.setCoords(Coords(std::make_pair(x,y)));
             rabbits[r.getId()] = r;
-            cells[x][y].addVictim(r.getId());
+            cells[y * FIELD_WIDTH + x].addVictim(r.getId());
             creaturesCounter++;
             allCreatureCounter++;            
         }
@@ -240,7 +255,7 @@ void Field::check()
             w.setField(this);
             w.setCoords(Coords(std::make_pair(x,y)));
             wolfs[w.getId()] = w;
-            cells[x][y].addPredator(w.getId());
+            cells[y * FIELD_WIDTH + x].addPredator(w.getId());
             creaturesCounter++;
             allCreatureCounter++;
         }
@@ -269,8 +284,8 @@ bool Field::wasRabbitHere(Coords p, int index)
 
 void Field::wolfWasHere(Coords p, int index)
 {
-    getCell(p).setWolfWasHere(true, index);
     getCell(p).setRabbitWasHere(false, index);
+    getCell(p).setWolfWasHere(true, index);
 }
 
 void Field::rabbitWasHere(Coords p, int index)
@@ -281,7 +296,7 @@ void Field::rabbitWasHere(Coords p, int index)
 
 Cell &Field::getCreatureCell(Coords coords)
 {
-    return cells[coords.x()][coords.y()];
+    return cells[coords.y() * FIELD_WIDTH + coords.x()];
 }
 
 void Field::run()
@@ -299,7 +314,18 @@ void Field::run()
             std::cerr << "All dead!\n";            
             write();
             generatePopulations();
-        } 
-        QThread::currentThread()->msleep(50);
+        }else {
+            if(noWolfs()){
+                std::cerr << "Wolfs dead!\n";
+                write();
+                populateWolfs();
+            }
+            if(noRabbits()){
+                std::cerr << "Rabbits dead!\n";
+                write();
+                populateRabbits();
+            }
+        }
+        QThread::currentThread()->msleep(10);
     }
 }

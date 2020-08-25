@@ -2,6 +2,10 @@
 #include "field.hpp"
 #include <cassert>
 
+int Creature::getAge() const {
+    return age;
+}
+
 int Creature::getid(){
     static int id = 0;
     return id++;

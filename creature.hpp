@@ -39,6 +39,7 @@ public:
     virtual void setField(Field *value);
     virtual void step() = 0;
     virtual bool isHungry();
+    virtual int getAge() const;
     virtual bool operator ==(const Creature &r);
     virtual bool operator !=(const Creature &r);    
 };

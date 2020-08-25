@@ -9,8 +9,8 @@
 #include <set>
 #include "defs.hpp"
 
-typedef std::set<int> Indexes;
-typedef std::map<int, unsigned int> Smells;
+using Indexes = std::set<int>;
+using Smells = std::map<int, unsigned int>;
 
 class Cell {
     Indexes wolfIndexes;
