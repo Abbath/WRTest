@@ -127,15 +127,13 @@ void Field::fixCoords(){
 
 void Field::cleanDead(Indexes itdw, Indexes itdr){
     for (int x : itdw) {
-        Cell& c = getCell(wolfs[x].getCoords());
-        c.removeWolfIndex(x);
+        getCell(wolfs[x].getCoords()).removeWolfIndex(x);
         wolfs.erase(x);
         creaturesCounter--;
         deadWolfs++;
     }
     for (int x : itdr) {
-        Cell& c = getCell(rabbits[x].getCoords());
-        c.removeRabbitIndex(x);
+        getCell(rabbits[x].getCoords()).removeRabbitIndex(x);
         rabbits.erase(x);
         creaturesCounter--;
         deadRabbits++;
@@ -182,6 +180,10 @@ void Field::step(){
     Indexes itdw;
     Indexes neww;
     for(auto it = wolfs.begin(); it != wolfs.end(); ++it){
+        if(!it->second.isAlive()){
+            itdw.insert(it->first);
+            continue;
+        }
         Cell& c = getCell(it->second.getCoords());
         if(!c.getRabbitIndexes().empty() && it->second.isHungry()){
             if(RandomGenerator::dice2() < 0.5){
@@ -198,35 +200,30 @@ void Field::step(){
         if(it->second.timeToGiveBirth()){
             neww.insert(it->first);
         }
-        if(!it->second.isAlive()){
-            itdw.insert(it->first);
-        }else{
-            it->second.step();
-        }
+        it->second.step();
     }        
     Indexes itdr;
     Indexes newr;
     for(auto it = rabbits.begin(); it != rabbits.end(); ++it){
+        if(!(it->second.isAlive())){
+            itdr.insert(it->first);
+            continue;
+        }
         Cell& c = getCell(it->second.getCoords());
         if(c.isThereGrass()){
             it->second.eat();
             c.eatGrass();
         }
         if(c.getRabbitIndexes().size() > 1){
-            it->second.makePregnant(); 
+            it->second.makePregnant();
         }
         if(it->second.timeToGiveBirth()){
             newr.insert(it->first);
         }
-        if(!(it->second.isAlive())){
-            itdr.insert(it->first);
-        }else{
-            it->second.step();
-        }
+        it->second.step();
     }  
     bornNew(neww, newr);
     cleanDead(itdw, itdr);
-//    fixCoords();
     stepCounter++;
     rabbitNumbers.push_back(rabbits.size());
     wolfsNumbers.push_back(wolfs.size()); 
@@ -301,11 +298,6 @@ Cell &Field::getCreatureCell(Coords coords)
 
 void Field::run()
 {
-//    static bool first = true;
-//    if(first){
-//        first = false;
-//        running.store(true, std::memory_order_relaxed);
-//    }
     while(running.load(std::memory_order_relaxed)){
         step();
         print();
@@ -326,6 +318,8 @@ void Field::run()
                 populateRabbits();
             }
         }
-        QThread::currentThread()->msleep(10);
+        if(creaturesCounter < 10000){
+            QThread::currentThread()->msleep(10);
+        }
     }
 }

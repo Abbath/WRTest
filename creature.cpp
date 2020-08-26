@@ -11,7 +11,7 @@ int Creature::getid(){
     return id++;
 }
 
-Creature::Creature(int _hungry) : idx(getid()), male(rand() % 2), hungry(_hungry), age(0), pregnancyTime(0) {
+Creature::Creature(int _hungry) : idx(getid()), male(RandomGenerator::dice() % 2), hungry(_hungry), age(0), pregnancyTime(0) {
     
 }
 

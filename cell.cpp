@@ -31,14 +31,14 @@ void Cell::setRabbitWasHere(bool value, int index)
 
 void Cell::removeRabbitIndexes(const Indexes &indexes)
 {
-    for(auto x : indexes){
+    for(auto& x : indexes){
         rabbitIndexes.erase(x);
     }
 }
 
 void Cell::removeWolfIndexes(const Indexes &indexes)
 {
-    for(auto x : indexes){
+    for(auto& x : indexes){
         wolfIndexes.erase(x);
     }
 }
@@ -78,7 +78,7 @@ void Cell::decreaseWolfSmell()
             itdw.insert(it->first);
         }
     }
-    for(auto it = itdw.begin(); it  !=  itdw.end(); ++it){
+    for(auto it = itdw.cbegin(); it  !=  itdw.cend(); ++it){
         wolfSmells.erase(*it);
     }
 }
@@ -95,22 +95,25 @@ void Cell::decreaseRabbitSmell()
             itdr.insert(it->first);
         }
     }
-    for(auto it = itdr.begin(); it != itdr.end(); ++it){
+    for(auto it = itdr.cbegin(); it != itdr.cend(); ++it){
         rabbitSmells.erase(*it);
     }
 }
 
 void Cell::growGrass()
 {
-    if(grass < GRASS_PER_CELL) grass+=3;
+    if(grass < GRASS_PER_CELL) {
+        grass+=3;
+    }
 }
 
 void Cell::eatGrass()
 {
-    if(grass > GRASS_PER_RABBIT) 
+    if(grass > GRASS_PER_RABBIT) {
         grass-=GRASS_PER_RABBIT;
-    else
+    } else {
         grass = 0;
+    }
 }
 
 void Cell::setWolfIndexes(const Indexes &value)

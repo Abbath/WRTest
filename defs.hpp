@@ -5,8 +5,8 @@
 #include "randomgenerator.hpp"
 
 constexpr int FIELD_SIZE = 60;
-constexpr int FIELD_WIDTH = 45;
-constexpr int FIELD_HEIGHT = 80;
+constexpr int FIELD_WIDTH = 240*2;
+constexpr int FIELD_HEIGHT = 45*2;
 constexpr int WOLF_MAX_AGE = 21840;
 constexpr int RABBIT_MAX_AGE = 8736;
 constexpr int WOLF_START_HUNGRY = 224;

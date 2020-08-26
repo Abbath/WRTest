@@ -48,28 +48,29 @@ std::pair<int, int> Coords::normalize(std::pair<int, int> c)
 {
     if(c.first < 0){
         c.first = FIELD_WIDTH - 1;
-    }
-    if(c.second < 0){
-        c.second = FIELD_HEIGHT -1;
-    }
-    if(c.first >= FIELD_WIDTH){
+    } else if(c.first >= FIELD_WIDTH){
         c.first = 0;
     }
-    if(c.second >= FIELD_HEIGHT){
+
+    if(c.second < 0){
+        c.second = FIELD_HEIGHT - 1;
+    } else if(c.second >= FIELD_HEIGHT){
         c.second = 0;
     }
+
     return c;
 }
 
 void Coords::fixCoords(int& newx, int& newy){
-    if(newx < 0)
+    if(newx < 0) {
         newx = FIELD_WIDTH - 1;
-    if(newy < 0)
-        newy = FIELD_HEIGHT - 1;
-    if(newx > FIELD_WIDTH - 1){
+    } else if(newx > FIELD_WIDTH - 1){
         newx = 0;
     }
-    if(newy > FIELD_HEIGHT - 1){
+
+    if(newy < 0) {
+        newy = FIELD_HEIGHT - 1;
+    } else if(newy > FIELD_HEIGHT - 1){
         newy = 0;
     }
 }
